@@ -1,0 +1,37 @@
+{% extends "valet_keys/base.html" %}
+
+{% block subcontent %}
+<p><a class="button" href="{% url valet_keys.list %}">Return to the key list</a></p>
+<dl class="key" id="key-{{ key.pk }}">
+    <dt>Created</dt>
+    <dd class="created">{{ key.created }}</dd>
+    <dt>Description</dt>
+    <dd class="description">{{ key.description }}</dd>
+</dl>
+{% if not items.object_list|length %}
+    <p>This key has not been used yet.</p>
+{% else %}
+    <table class="items" cellpadding="4">
+        <tr>
+            <th>Time</th>
+            <th>Action</th>
+            <th>Object</th>
+            <th>Notes</th>
+        </tr>
+        {% for item in items.object_list %}
+            <tr class="item">
+                <td class="created">{{ item.created }}</td>
+                <td class="action">{{ item.action }}</td>
+                <td class="object">
+                    {% if item.content_object.get_absolute_url %}
+                        <a href="{{ item.content_object.get_absolute_url }}">{{ item.content_object }}</a>
+                    {% else %}
+                        <span>{{ short_desc }}</span>
+                    {% endif %}
+                </td>
+                <td class="notes">{{ item.notes }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}

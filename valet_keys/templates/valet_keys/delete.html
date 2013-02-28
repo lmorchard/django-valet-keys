@@ -1,0 +1,15 @@
+{% extends "valet_keys/base.html" %}
+
+{% block subcontent %}
+    <dl class="key" id="key-{{ key.pk }}">
+        <dt>Created</dt>
+        <dd class="created">{{ key.created }}</dd>
+        <dt>Description</dt>
+        <dd class="description">{{ key.description }}</dd>
+    </dl>
+    <form method="POST" action="" class="key">
+        <p>Are you sure?</p>
+        <button type="submit" name="action_delete">Delete</button>
+        <a class="button positive" href="{% url valet_keys.list %}">Cancel</a>
+    </form>
+{% endblock %}

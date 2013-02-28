@@ -1,0 +1,32 @@
+{% extends "valet_keys/base.html" %}
+
+{% block subcontent %}
+<p>
+    These are your API keys. They're useful for building applications that
+    perform tasks on MDN on your behalf. If you have stopped using any of
+    them, or suspect one has been exposed to parties you don't trust with your
+    account, click the <span class="button">X</span> to delete the key.  It's
+    easy to create a replacement key at any time.
+</p>
+<p><a class="button positive" href="{% url valet_keys.new %}">Create a new key</a></p>
+{% if not keys %}
+    <p>You have no API keys, yet.</p>
+{% else %}
+    <table class="keys" cellpadding="4">
+        {% for key in keys %}
+        <tr class="key" id="key-{{ key.pk }}">
+            <td class="actions">
+                <a class="button negative"
+                   title="Delete key"
+                   href="{% url valet_keys.delete key.pk %}">X</a>
+                <a class="button positive"
+                   title="View key usage history"
+                   href="{% url valet_keys.history key.pk %}">History {{ key.history.count }}</a>
+            </td>
+            <td class="created">{{ key.created }}</td>
+            <td class="description">{{ key.description }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}
