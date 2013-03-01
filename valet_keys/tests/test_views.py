@@ -174,8 +174,6 @@ class KeyViewsTest(TestCase):
         resp = self.client.get(url)
         eq_(200, resp.status_code)
         page = pq(resp.content)
-        logging.debug("FOO %s" % resp.content)
         eq_(1, page.find('#key-%s.disabled' % self.key1.pk).length)
 
         ok_(Key.objects.get(pk=self.key1.pk).is_disabled)
-        ok_(False)
