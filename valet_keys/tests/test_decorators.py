@@ -12,8 +12,8 @@ from django.http import HttpRequest
 from nose.tools import assert_equal, with_setup, assert_false, eq_, ok_
 from nose.plugins.attrib import attr
 
-from valet_keys.models import Key
-from valet_keys.decorators import accepts_auth_key
+from ..models import Key
+from ..decorators import accepts_valet_key
 
 
 class KeyDecoratorsTest(TestCase):
@@ -30,36 +30,45 @@ class KeyDecoratorsTest(TestCase):
         user = User(username="test23", email="test23@example.com")
         user.save()
 
-        key = Key(user=user)
-        secret = key.generate_secret()
-        key.save()
-
-        @accepts_auth_key
+        @accepts_valet_key
         def fake_view(request, foo, bar):
             return (foo, bar)
 
-        cases = ((key.key, secret, True),
-                 (key.key, 'FAKE', False),
-                 ('FAKE',  secret, False),
-                 ('FAKE',  'FAKE', False))
+        for is_disabled in (False, True):
 
-        for k, s, success in cases:
+            key = Key(user=user)
+            secret = key.generate_secret()
+            key.save()
 
-            request = HttpRequest()
-            request.user = AnonymousUser()
+            if is_disabled:
+                key.disable()
 
-            auth = '%s:%s' % (k, s)
-            b64_auth = base64.encodestring(auth)
-            request.META['HTTP_AUTHORIZATION'] = 'Basic %s' % b64_auth
+            cases = (
+                (key.key, secret, True),
+                (key.key, 'FAKE', False),
+                ('FAKE',  secret, False),
+                ('FAKE',  'FAKE', False),
+            )
 
-            foo, bar = fake_view(request, 'foo', 'bar')
-            eq_('foo', foo)
-            eq_('bar', bar)
+            for k, s, success in cases:
 
-            if not success:
-                ok_(not request.user.is_authenticated())
-            else:
-                ok_(request.user.is_authenticated())
-                ok_(request.user == user)
-                ok_(request.authkey)
-                ok_(request.authkey == key)
+                request = HttpRequest()
+                request.user = AnonymousUser()
+
+                auth = '%s:%s' % (k, s)
+                b64_auth = base64.encodestring(auth)
+                request.META['HTTP_AUTHORIZATION'] = 'Basic %s' % b64_auth
+
+                foo, bar = fake_view(request, 'foo', 'bar')
+                eq_('foo', foo)
+                eq_('bar', bar)
+
+                if not success or is_disabled:
+                    ok_(not request.user.is_authenticated())
+                else:
+                    ok_(request.user.is_authenticated())
+                    ok_(request.user == user)
+                    ok_(request.valet_key)
+                    ok_(request.valet_key == key)
+
+            key.delete()

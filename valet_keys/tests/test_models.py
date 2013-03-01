@@ -14,7 +14,7 @@ from nose.plugins.attrib import attr
 
 from django.db import models
 
-from valet_keys.models import Key
+from ..models import Key
 
 
 class KeyViewsTest(TestCase):

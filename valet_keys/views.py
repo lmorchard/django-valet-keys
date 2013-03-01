@@ -56,12 +56,12 @@ def history(request, pk):
 
 
 @login_required
-def delete(request, pk):
+def disable(request, pk):
     key = get_object_or_404(Key, pk=pk)
     if key.user != request.user:
         raise PermissionDenied
     if request.method == "POST":
-        key.delete()
+        key.disable()
         return HttpResponseRedirect(reverse('valet_keys.list'))
-    return render_to_response('valet_keys/delete.html', dict(key=key),
+    return render_to_response('valet_keys/disable.html', dict(key=key),
                               context_instance=RequestContext(request))

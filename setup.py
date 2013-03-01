@@ -27,8 +27,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=[
-        'django>=1.2',
-        'PIL',
+        'django>=1.4',
     ],
     tests_require=[
         'nose',

@@ -18,8 +18,8 @@ from django.db import models
 
 from django.core.urlresolvers import reverse
 
-from valet_keys.models import Key
-from valet_keys.views import ITEMS_PER_PAGE
+from ..models import Key
+from ..views import ITEMS_PER_PAGE
 
 
 class KeyViewsTest(TestCase):
@@ -140,19 +140,27 @@ class KeyViewsTest(TestCase):
                 ok_('%s' % expected[1] in line[1])
                 eq_(expected[2], line[2])
 
-    def test_delete_key(self):
-        """User should be able to delete own keys, but no one else's"""
+    def test_disable_key(self):
+        """User should be able to disable own keys, but no one else's"""
         self.client.login(username=self.username,
                           password=self.password)
 
-        url = reverse('valet_keys.delete', args=(self.key3.pk,))
+        url = reverse('valet_keys.disable', args=(self.key3.pk,))
         resp = self.client.get(url, follow=True)
         eq_(403, resp.status_code)
 
         resp = self.client.post(url, follow=False)
         ok_(403, resp.status_code)
 
-        url = reverse('valet_keys.delete', args=(self.key1.pk,))
+        url = reverse('valet_keys.list')
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        page = pq(resp.content)
+        eq_(0, page.find('#key-%s.disabled' % self.key1.pk).length)
+
+        ok_(not Key.objects.get(pk=self.key1.pk).is_disabled)
+
+        url = reverse('valet_keys.disable', args=(self.key1.pk,))
         resp = self.client.get(url, follow=True)
         eq_(200, resp.status_code)
 
@@ -162,4 +170,12 @@ class KeyViewsTest(TestCase):
         resp = self.client.post(url, follow=False)
         ok_(302, resp.status_code)
 
-        eq_(0, Key.objects.filter(pk=self.key1.pk).count())
+        url = reverse('valet_keys.list')
+        resp = self.client.get(url)
+        eq_(200, resp.status_code)
+        page = pq(resp.content)
+        logging.debug("FOO %s" % resp.content)
+        eq_(1, page.find('#key-%s.disabled' % self.key1.pk).length)
+
+        ok_(Key.objects.get(pk=self.key1.pk).is_disabled)
+        ok_(False)

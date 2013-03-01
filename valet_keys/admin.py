@@ -18,11 +18,12 @@ history_link.short_description = 'Usage history'
                   
 
 class KeyAdmin(admin.ModelAdmin):
-    fields = ('description',)
-    list_display = ('id', 'user', 'created', history_link, 'key',
-                    'description')
+    fields = ('is_disabled', 'description',)
+    list_display = ('id', 'user', 'is_disabled', 'created', history_link,
+                    'key', 'description')
     ordering = ('-created', 'user')
     search_fields = ('key', 'description', 'user__username',)
+    readonly_fields = ('key',)
 
 
 def key_link(self):

@@ -41,6 +41,7 @@ class Key(models.Model):
             max_length=128, editable=False, db_index=False)
     description = models.TextField(_("Description of intended use"),
             blank=False)
+    is_disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
@@ -54,6 +55,10 @@ class Key(models.Model):
 
     def check_secret(self, secret):
         return hash_secret(secret) == self.hashed_secret
+
+    def disable(self):
+        self.is_disabled = True
+        self.save()
 
     def log(self, action, content_object=None, notes=None):
         action = KeyAction(key=self, action=action,
