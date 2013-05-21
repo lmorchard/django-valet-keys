@@ -33,7 +33,6 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
 .. vim:set tw=78 ai fo+=n fo-=l ft=rst:
