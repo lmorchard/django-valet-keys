@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import *
 
 urlpatterns = patterns('valet_keys.views',
     url(r'^$', 'list', name='valet_keys.list'),
